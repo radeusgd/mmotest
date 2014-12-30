@@ -1,0 +1,9 @@
+{
+  "name": "rpg-server",
+  "version": "0.1.1",
+  "description": "HTML5 RPG game server/host",
+  "dependencies": {
+    "express": "~4.10.0",
+    "socket.io": "~1.1.0"
+  }
+}

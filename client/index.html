@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>RPG game Beta</title>
+</head>
+<body>
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<h5>TODO: insert scripts</h5>
+	<form action="#"><input id="msg" type="text"></form>
+	<div id="debug" style="background:#AAAAAA;height:100pt;overflow:auto;">Debug data:<br></div>
+	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+	<script>
+		function log(text){
+			$("#debug").append(text+"<br>");
+			$("#debug").animate({ scrollTop: $("#debug").prop('scrollHeight') }, "slow");
+		}
+		function error(data){
+			log("Error: "+data);
+		}
+		var ip = window.location.hostname+":3000";
+		log("Connecting to "+ip);
+		var socket = io(ip);
+		socket.on("connect_tiemout", error);
+		socket.on("connect_error", error);
+		socket.on("connect_fail", error);
+		socket.on("connect", function(data){
+			log("Connected!");
+		});
+		setUpSystems();
+		function setUpSystems(){
+			$("#msg").parent().submit(function(){
+				if($("#msg").val()=="") return;
+				socket.emit("chat_message",$("#msg").val());
+				$("#msg").val("");
+			});
+			socket.on("disconnect", function(data){
+				log("Disconnected ("+data+")");
+				log("Attempting reconnect");
+			});
+			socket.on("reconnect_fail", error);
+			socket.on("message", function(text){
+				log(text);
+			});
+		}
+	</script>
+</body>
+</html>
