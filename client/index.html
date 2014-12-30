@@ -7,8 +7,10 @@
 <body>
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 	<h5>TODO: insert scripts</h5>
-	<form action="#"><input id="msg" type="text"></form>
-	<div id="debug" style="background:#AAAAAA;height:100pt;overflow:auto;">Debug data:<br></div>
+	<div style="border:1pt;">
+	<form action="">Debug console:<input id="msg" type="text" size="100"></form>
+	<div id="debug" style="background:#AAAAAA;height:100pt;overflow:auto;"></div>
+	</div>
 	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
 	<script>
 		function log(text){
@@ -33,6 +35,7 @@
 				if($("#msg").val()=="") return;
 				socket.emit("chat_message",$("#msg").val());
 				$("#msg").val("");
+				return false;
 			});
 			socket.on("disconnect", function(data){
 				log("Disconnected ("+data+")");
