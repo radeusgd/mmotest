@@ -37,7 +37,11 @@
 				$("#msg").val("");
 				return false;
 			});
-			socket.on("disconnect", function(data){
+			socket.on("disconnecting", function(reason){
+				log("Disconnecting, won't try to reconnect, because - "+reason);
+				socket.io.reconnection(false);
+			});
+			socket.on("disconnect", function(data){//socket disconnected
 				log("Disconnected ("+data+")");
 				log("Attempting reconnect");
 			});

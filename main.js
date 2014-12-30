@@ -15,6 +15,10 @@ rl.on('line', function(line) {
 			io.emit('message', message);
 			console.log(message);
 		break;
+		case "stop":
+			io.emit('disconnecting', "Server shutting down");
+			rl.close();
+		break;
 		default:
 			//console.log("Invalid command");
 	}
