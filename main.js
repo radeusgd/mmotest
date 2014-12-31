@@ -29,22 +29,20 @@ rl.on('close',function(){
 });
 
 app.use(express.static(__dirname + '/client'));
-app.get('/dynamictest', function(req, res){ 
+app.get('/dynamictest', function(req, res){
 	console.log("Dynamic content serving test");
 });
 
 
-io.on('connection', function(socket){ 
+io.on('connection', function(socket){
 	console.log('a user connected');
 	socket.on('chat_message', function(text){
-		if(text=="") return;
+		if(text==="") return;
 		console.log("User: "+text);
 		io.emit('message', "User: "+text);
 	});
 });
 
-http.listen(3000, function(){ 
+http.listen(3000, function(){
 	console.log('listening on *:3000');
 });
-
-
