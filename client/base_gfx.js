@@ -1,19 +1,25 @@
 var layersCount = 7;
-function createChunk(){
+var chunkSize = 8;
+function createChunk(x,y){
    var map = game.add.tilemap(null);
    map.addTilesetImage('tile1','tile1', 64, 64);//set-up tilesets
    map.layerRefs = {};
-   map.layerRefs[0] = map.create('layer1', 16, 16, 64, 64);
-   for(var i=0;i<layersCount;i++){
-      map.layerRefs[i+1] = map.createBlankLayer('layer'+(i+2), 16, 16, 64, 64);
+   map.layerRefs[0] = map.create('layer0', chunkSize, chunkSize, 64, 64);
+   for(var i=1;i<layersCount;i++){
+      map.layerRefs[i] = map.createBlankLayer('layer'+(i), chunkSize, chunkSize, 64, 64);
+   }
+   for(var j=0;i<layersCount;i++){
+      map.layerRefs[i].world.x = x;
+      map.layerRefs[i].world.y = y;
+      map.layerRefs[i].depth = 100*i;
    }
    return map;
 }
 function generateChunk(chunk){//temporary function for proc gen
    for(var x=0;x<16;x++){
       for(var y=0;y<16;y++){
-            var tile = x+40*y;//x%30+30*y;
-            chunk.putTile(tile, x,y, chunk.layerRefs[0]);
+            var tile = 30+x+40*y;//x%30+30*y;
+            chunk.putTile(tile, x,y, chunk.layerRefs[x%5]);
       }
    }
    //chunk.random(0,0,16,16, chunk.layerRefs[0]);
@@ -33,12 +39,15 @@ window.onload = function() {
       game.stage.backgroundColor = '#222235';
       cursors = game.input.keyboard.createCursorKeys();
 
-      var c1 = createChunk();
+      var c1 = createChunk(0,0);
       generateChunk(c1);
+      var c2 = createChunk(64*chunkSize,0);
+      generateChunk(c2);
       c1.scale = 2;
-      game.world.setBounds(0,0,500*64,500*64);
+      game.world.setBounds(0,0,7*chunkSize*64,7*chunkSize*64);
 
       player = game.add.sprite(300, 310, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
+      player.depth = 10;
       //set-up player anims
       player.animations.add("idle", [130],1,true);
       player.animations.add("walkUp", [105,106,107,108,109,110,111,112],10,true);//8*13=104
@@ -68,6 +77,8 @@ window.onload = function() {
    function update(){
       player.body.velocity.x = 0;player.body.velocity.y = 0;
       controls();
+
+      game.world.sort('depth');
    }
    function render(){
       game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
