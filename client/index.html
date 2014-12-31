@@ -3,53 +3,18 @@
 <head>
 <meta charset="utf-8">
 <title>RPG game Beta</title>
+
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="phaser.min.js"></script>
 </head>
 <body>
-	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<h5>TODO: insert scripts</h5>
+	<div id="game"></div>
 	<div style="border:1pt;">
 	<form action="">Debug console:<input id="msg" type="text" size="100"></form>
 	<div id="debug" style="background:#AAAAAA;height:100pt;overflow:auto;"></div>
 	</div>
 	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
-	<script>
-		function log(text){
-			$("#debug").append(text+"<br>");
-			$("#debug").animate({ scrollTop: $("#debug").prop('scrollHeight') }, "slow");
-		}
-		function error(data){
-			log("Error: "+data);
-		}
-		var ip = window.location.hostname+":3000";
-		log("Connecting to "+ip);
-		var socket = io(ip);
-		socket.on("connect_tiemout", error);
-		socket.on("connect_error", error);
-		socket.on("connect_fail", error);
-		socket.on("connect", function(data){
-			log("Connected!");
-		});
-		setUpSystems();
-		function setUpSystems(){
-			$("#msg").parent().submit(function(){
-				if($("#msg").val()=="") return;
-				socket.emit("chat_message",$("#msg").val());
-				$("#msg").val("");
-				return false;
-			});
-			socket.on("disconnecting", function(reason){
-				log("Disconnecting, won't try to reconnect, because - "+reason);
-				socket.io.reconnection(false);
-			});
-			socket.on("disconnect", function(data){//socket disconnected
-				log("Disconnected ("+data+")");
-				log("Attempting reconnect");
-			});
-			socket.on("reconnect_fail", error);
-			socket.on("message", function(text){
-				log(text);
-			});
-		}
-	</script>
+	<script src="/base_net.js"></script>
+	<script src="/base_gfx.js"></script>
 </body>
 </html>
