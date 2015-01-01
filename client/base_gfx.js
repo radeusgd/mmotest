@@ -1,6 +1,6 @@
 
 window.onload = function() {
-   game = new Phaser.Game(1280, 720, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update, render: render }); //AUTO??
+   game = new Phaser.Game(1280, 720, Phaser.AUTO, 'game', { preload: preload, create: create, update: update, render: render });
 
    function preload () {
       game.time.advancedTiming = true;
@@ -19,7 +19,7 @@ window.onload = function() {
       makeWorldChunk(1,1);
 
       player = game.add.sprite(300, 310, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
-      player.depth = 10;
+      player.z = 200;
       //set-up player anims
       player.animations.add("idle", [130],1,true);
       player.animations.add("walkUp", [105,106,107,108,109,110,111,112],10,true);//8*13=104
@@ -50,7 +50,7 @@ window.onload = function() {
       player.body.velocity.x = 0;player.body.velocity.y = 0;
       controls();
 
-      game.world.sort('depth');
+      game.world.sort('z');
    }
    function render(){
       game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
