@@ -10,24 +10,44 @@ function move(dx,dy){
          if(x+dx>=0 && x+dx<7 && y+dy>=0 && y+dy<7){
             newTerrain[x+y*7] = terrain[(x+dx)+7*(y+dy)];
             //TODO move positions in world
-            terrain[(x+dx)+7*(y+dy)] = undefined;
+            terrain[(x+dx)+7*(y+dy)] = false;
          }
       }
    }
+   //console.log(terrain);
    for(x=0;x<7;x++){
       for(y=0;y<7;y++){
-            if(terrain[x+y*7]!==undefined){
-               for(var elem in terrain[x+y*7]){
-                     elem.destroy(true);
+            if(terrain[x+y*7]!==undefined && terrain[x+y*7]!==false){
+               for(var i=0;i<terrain[x+y*7].length;i++){
+                  terrain[x+y*7][i].destroy(true);
                }
                //TODO cache
             }
       }
    }
    terrain = newTerrain;
+   game.world.forEach(function(child,dx,dy){
+      child.x -= dx*tileSize*chunkSize;
+      child.y -= dy*tileSize*chunkSize;
+   },this, false, dx, dy);
 }
 function updateTerrains(){
-   var actionTaken = false;
+   var center = 3.5*chunkSize*tileSize;
+   var halfchunk = 0.5*chunkSize*tileSize;
+   //should we move player
+   if(player.x>center+halfchunk){
+      move(1,0);
+   }
+   if(player.x<center-halfchunk){
+      move(-1,0);
+   }
+   if(player.y>center+halfchunk){
+      move(0,1);
+   }
+   if(player.y<center-halfchunk){
+      move(0,-1);
+   }
+   //request surroundings
    for(x=1;x<6;x++){//priority needed?
       for(y=1;y<6;y++){
          if(terrain[x+y*7]===undefined && (pendingTransfers[(x+currentTerrainPos.x)+'x'+(y+currentTerrainPos.y)]!==true)){

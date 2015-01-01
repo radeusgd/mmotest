@@ -22,5 +22,5 @@ function requestChunk(x,y){
       console.log("Net sim");
       var chunk = generateChunk(x,y);
       onChunkReceived(chunk, {x:x,y:y});
-   }, Math.random()*5000+300);//lulz
+   }, Math.random()*2300+100);//lulz
 }
