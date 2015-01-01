@@ -11,14 +11,9 @@ window.onload = function() {
       game.stage.backgroundColor = '#222235';
       cursors = game.input.keyboard.createCursorKeys();
 
-      game.world.setBounds(0,0,7*chunkSize*64,7*chunkSize*64);
+      game.world.setBounds(0,0,7*chunkSize*tileSize,7*chunkSize*tileSize);
 
-      makeWorldChunk(0,0);
-      makeWorldChunk(0,1);
-      makeWorldChunk(1,0);
-      makeWorldChunk(1,1);
-
-      player = game.add.sprite(300, 310, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
+      player = game.add.sprite(3.5*chunkSize*tileSize, 3.5*chunkSize*tileSize, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
       player.z = 200;
       //set-up player anims
       player.animations.add("idle", [130],1,true);
@@ -49,6 +44,8 @@ window.onload = function() {
    function update(){
       player.body.velocity.x = 0;player.body.velocity.y = 0;
       controls();
+
+      updateTerrains();
 
       game.world.sort('z');
    }
