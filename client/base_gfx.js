@@ -14,7 +14,7 @@ window.onload = function() {
       game.world.setBounds(0,0,7*chunkSize*tileSize,7*chunkSize*tileSize);
 
       player = game.add.sprite(3.5*chunkSize*tileSize, 3.5*chunkSize*tileSize, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
-      player.z = 200;
+      player.depth = 200;
       //set-up player anims
       player.animations.add("idle", [130],1,true);
       player.animations.add("walkUp", [105,106,107,108,109,110,111,112],10,true);//8*13=104
@@ -47,7 +47,7 @@ window.onload = function() {
 
       updateTerrains();
 
-      game.world.sort('z');
+      game.world.sort('depth');
    }
    function render(){
       game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");

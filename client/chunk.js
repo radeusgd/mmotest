@@ -1,4 +1,4 @@
-var layersCount = 4;
+var layersCount = 7;
 var chunkSize = 8;
 var tileSize = 64;
 
@@ -31,7 +31,7 @@ function makeWorldChunk(chunk, x,y){
    var img = new Array(layersCount);
    for(var i=0;i<layersCount;i++){
          img[i] = game.add.image(x*tileSize*chunkSize,y*tileSize*chunkSize, s[i]);//TODO destroying the texture might be needed? or GC?
-         img[i].z = 100*i;
+         img[i].depth = 100*i;
    }
    return img;
 }

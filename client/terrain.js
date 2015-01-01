@@ -1,5 +1,5 @@
 terrain = new Array(7*7);
-currentTerrainPos = {x:0,y:0};
+currentTerrainPos = {x:0,y:0};//IMPORTANT - complements player.xy for a full player position
 function move(dx,dy){
    var x,y;
    currentTerrainPos.x+=dx;
