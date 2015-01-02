@@ -42,7 +42,14 @@ var pid = 123;
 io.on('connection', function(socket){
 	console.log('a user connected');
 	socket.id = pid++;
-	socket.emit('init', {id: socket.id});
+	socket.player = {};
+	socket.player.x = 3.5*8;
+	socket.player.y = 3.5*8;
+	socket.emit('init', {
+		id: socket.id,
+		x: socket.player.x,
+		y: socket.player.y,//TODO is world pos needed?
+	});
 	socket.on('chat_message', function(text){
 		if(text==="") return;
 		console.log("User: "+text);
@@ -50,7 +57,9 @@ io.on('connection', function(socket){
 	});
 	socket.on('moved', function(movement){
 		//TODO check if can move
-		io.emit('playerMoved', {id: socket.id, x: movement.x, y: movement.y});
+		socket.player.x+=movement.x;
+		socket.player.y+=movement.y;
+		io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});
 	});
 
 });

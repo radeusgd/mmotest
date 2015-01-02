@@ -17,15 +17,19 @@ return chunk;
 function setUpProtocol(){
    socket.on('init', function(data){
       player.id = data.id;
+      player.target.x = player.x = data.x*64;
+      player.target.y = player.y = data.y*64;
       log("Local id set to "+data.id);
    });
    socket.on('playerMoved', function(data){
-      console.log(data);
+      //console.log(data);
       allPlayers.forEach(function(player){
             if(player.id == data.id){
                //TODO world->local
-               player.target.x = data.x;
-               player.target.y = data.y;
+               var x = data.x-currentTerrainPos.x*chunkSize;
+               var y = data.y-currentTerrainPos.y*chunkSize;
+               player.target.x = x*64;
+               player.target.y = y*64;
             }
       });
    });

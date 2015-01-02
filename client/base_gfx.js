@@ -85,7 +85,7 @@ window.onload = function() {
          if (cursors.up.isDown){
             player.target.y-=tileSize;
             player.canMove = false;
-            sendMoved(0,1);
+            sendMoved(0,-1);
          }
       /*if (cursors.right.isDown){player.body.velocity.x += v;}
       if (cursors.up.isDown){player.body.velocity.y += -v;}
