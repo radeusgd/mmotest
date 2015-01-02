@@ -51,6 +51,18 @@ function setUpProtocol(){
    });
 }
 
+function disconnectHandler(){
+   //we've been disconnected, clean up the session
+
+   //remove all players but me
+   allPlayers.forEach(function(p){
+      if(p!=player){
+         p.destroy(true);
+      }
+   });
+   allPlayers = [player];
+}
+
 function requestChunk(x,y){
    pendingTransfers[(x)+'x'+(y)] = true;
    //TODO cache

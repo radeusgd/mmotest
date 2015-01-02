@@ -32,7 +32,7 @@ function log(text){
    });
    socket.on("disconnect", function(data){//socket disconnected
      log("Disconnected ("+data+")");
-     log("Attempting reconnect");
+     disconnectHandler();
    });
    socket.on("reconnect_fail", error);
    socket.on("reconnect_failed", function(){
