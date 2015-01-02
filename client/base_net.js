@@ -15,7 +15,9 @@ function log(text){
     socket.on("connect_fail", error);
     socket.on("connect", function(data){
          log("Connected!");
-         setUpProtocol();
+         if(!protocolInitialized){
+            setUpProtocol();
+         }
     });
     setUpSystems();
 }

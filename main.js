@@ -12,7 +12,7 @@ rl.on('line', function(line) {
 	switch(words[0]){
 		case "say":
 			var message = "[SERVER] "+words.slice(1).join(" ");
-			io.emit('message', message);
+			say(message);
 			console.log(message);
 		break;
 		case "stop":
@@ -51,6 +51,7 @@ var pid = 123;
 players = [];
 io.on('connection', function(socket){
 	console.log('Player joined, ip:', socket.request.connection.remoteAddress);
+	say("Player joined");
 	socket.id = pid++;
 	socket.player = {};
 	socket.player.x = 3.5*chunkSize;
@@ -69,8 +70,8 @@ io.on('connection', function(socket){
 	players.push(socket);
 	socket.on('chat_message', function(text){
 		if(text==="") return;
-		console.log("User: "+text);
-		io.emit('message', "["+socket.id+"] "+text);
+		console.log("["+socket.id+"] "+text);
+		io.emit('chat_message', {id: socket.id, text: text});
 	});
 	socket.on('moved', function(movement){
 		//TODO check if can move
@@ -91,12 +92,17 @@ io.on('connection', function(socket){
 	});
 	socket.on('disconnect', function(){
 		players.splice(players.indexOf(socket),1);//remove
+		say("Player disconnected");
 		io.emit('removePlayer',{id: socket.id});
 		console.log("Player disconnected");
 	});
 
 
 });
+
+function say(text){
+	io.emit('message', text);
+}
 
 function sendPlayer(who, to){
 	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y});
