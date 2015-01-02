@@ -21,7 +21,6 @@ function move(dx,dy){
                for(var i=0;i<terrain[x+y*7].length;i++){
                   terrain[x+y*7][i].destroy(true);
                }
-               //TODO cache
             }
       }
    }
@@ -70,8 +69,5 @@ function onChunkReceived(chunk, pos){
       var x = pos.x - currentTerrainPos.x;
       var y = pos.y - currentTerrainPos.y;
       terrain[x+y*7] = makeWorldChunk(chunk, x,y);
-   }else{
-      //sorry you discarded
-      //TODO cache
    }
 }

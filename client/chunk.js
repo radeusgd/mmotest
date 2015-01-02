@@ -14,7 +14,7 @@ function createChunk(chunk){//renders the chunk and returns its sprite
       for(var x=0;x<chunkSize;x++){
          for(var y=0;y<chunkSize;y++){
                var tile = chunk[localChunkPosToArray(x,y,i)];
-               if(tile !== undefined){
+               if(tile !== undefined && tile!=10000){
                   tmpImage.animations.frame = tile;
                   sprite.renderXY(tmpImage, x*tileSize, y*tileSize, false);
                }
