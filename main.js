@@ -19,6 +19,12 @@ rl.on('line', function(line) {
 			io.emit('disconnecting', "Server shutting down");
 			rl.close();
 		break;
+		case "list":
+			console.log("Players:");
+			for(var i=0;i<players.length;i++){
+					console.log("(",players[i].id,") - ", players[i].request.connection.remoteAddress);
+			}
+		break;
 		default:
 			//console.log("Invalid command");
 	}
@@ -44,7 +50,7 @@ var layersCount = 7;
 var pid = 123;
 players = [];
 io.on('connection', function(socket){
-	console.log('a user connected');
+	console.log('Player joined, ip:', socket.request.connection.remoteAddress);
 	socket.id = pid++;
 	socket.player = {};
 	socket.player.x = 3.5*chunkSize;
@@ -64,10 +70,11 @@ io.on('connection', function(socket){
 	socket.on('chat_message', function(text){
 		if(text==="") return;
 		console.log("User: "+text);
-		io.emit('message', "User: "+text);
+		io.emit('message', "["+socket.id+"] "+text);
 	});
 	socket.on('moved', function(movement){
 		//TODO check if can move
+		//if cannot send him a 'cannotMove' message so he can update his pos appropriately
 		socket.player.x+=movement.x;
 		socket.player.y+=movement.y;
 		io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});

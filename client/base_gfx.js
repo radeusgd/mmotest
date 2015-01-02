@@ -74,6 +74,14 @@ window.onload = function() {
    }
 
    function controls(){
+      if(!player.canMove){
+         var dx = player.target.x - player.x;
+         var dy = player.target.y - player.y;
+         if(dx*dx+dy*dy<10){
+            player.canMove = true;
+         }
+      }
+
       if(player.canMove){
          if (cursors.left.isDown){
             player.target.x-=tileSize;
@@ -99,11 +107,11 @@ window.onload = function() {
       if (cursors.up.isDown){player.body.velocity.y += -v;}
       if (cursors.down.isDown){player.body.velocity.y += v;}*/
 
-         if(!player.canMove){
+         /*if(!player.canMove){
             setTimeout(function(){
-               player.canMove = true;
+               //player.canMove = true;//now a speed based solution
             }, 900*(playerSpeed/tileSize));
-         }
+         }*/
       }
    }
    function update(){

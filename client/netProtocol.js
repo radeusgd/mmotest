@@ -1,5 +1,12 @@
 pendingTransfers = {};
 
+function serverToLocalPos(x,y){
+   return {
+         x: (x-currentTerrainPos.x*chunkSize)*tileSize,
+         y: (y-currentTerrainPos.y*chunkSize)*tileSize,
+   };
+}
+
 function setUpProtocol(){
    socket.on('init', function(data){
       player.id = data.id;
@@ -10,14 +17,15 @@ function setUpProtocol(){
       log("Local id set to "+data.id);
    });
    socket.on('addPlayer', function(data){
-      console.log(data);
+      //console.log(data);
       if(data.id==player.id) return;//it's me hey
          //TODO if it's me I can still download clothing here!!
-      var p = createPlayer((data.x-currentTerrainPos.x*chunkSize)*tileSize,(data.y-currentTerrainPos.y*chunkSize)*tileSize);
+      var pos = serverToLocalPos(data.x, data.y);
+      var p = createPlayer(pos.x,pos.y);
       p.id = data.id;
    });
    socket.on('removePlayer', function(data){
-      console.log("removing", data);
+      //console.log("removing", data);
       if(data.id==player.id){
          return;//it's me hey//TODO sure?
       }
@@ -31,15 +39,24 @@ function setUpProtocol(){
    });
    socket.on('playerMoved', function(data){
       //console.log(data);
+      if(data.id==player.id){
+         return;//if it's me I don't care unless I get 'cannotMove'
+      }
       allPlayers.forEach(function(player){
             if(player.id == data.id){
                //TODO world->local
-               var x = data.x-currentTerrainPos.x*chunkSize;
-               var y = data.y-currentTerrainPos.y*chunkSize;
-               player.target.x = x*tileSize;
-               player.target.y = y*tileSize;
+               var pos = serverToLocalPos(data.x, data.y);
+               player.target.x = pos.x;
+               player.target.y = pos.y;
             }
       });
+   });
+   socket.on('cannotMove', function(data){
+      var pos = serverToLocalPos(data.x, data.y);
+      player.x = pos.x;
+      player.y = pos.y;
+      player.target.x = pos.x;
+      player.target.y = pos.y;
    });
    socket.on('chunk', function(data){
       //console.log(data);
