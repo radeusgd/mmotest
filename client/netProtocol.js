@@ -14,6 +14,23 @@ chunk[localChunkPosToArray(x,y,1)] = 23*7;
 return chunk;
 }
 
+function setUpProtocol(){
+   socket.on('init', function(data){
+      player.id = data.id;
+      log("Local id set to "+data.id);
+   });
+   socket.on('playerMoved', function(data){
+      console.log(data);
+      allPlayers.forEach(function(player){
+            if(player.id == data.id){
+               //TODO world->local
+               player.target.x = data.x;
+               player.target.y = data.y;
+            }
+      });
+   });
+}
+
 function requestChunk(x,y){
    pendingTransfers[(x)+'x'+(y)] = true;
    //TODO net
@@ -23,4 +40,8 @@ function requestChunk(x,y){
       var chunk = generateChunk(x,y);
       onChunkReceived(chunk, {x:x,y:y});
    }, Math.random()*2300+100);//lulz
+}
+
+function sendMoved(dx,dy){
+   socket.emit('moved', {x:dx,y:dy});
 }

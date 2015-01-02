@@ -29,6 +29,14 @@ function move(dx,dy){
    game.world.forEach(function(child,dx,dy){
       child.x -= dx*tileSize*chunkSize;
       child.y -= dy*tileSize*chunkSize;
+      if(child.hasOwnProperty('previous')){
+         child.previous.x -= dx*tileSize*chunkSize;
+         child.previous.y -= dy*tileSize*chunkSize;
+      }
+      if(child.hasOwnProperty('target')){
+         child.target.x -= dx*tileSize*chunkSize;
+         child.target.y -= dy*tileSize*chunkSize;
+      }
    },this, false, dx, dy);
 }
 function updateTerrains(){

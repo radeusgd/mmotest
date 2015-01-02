@@ -33,16 +33,24 @@ app.get('/dynamictest', function(req, res){
 	console.log("Dynamic content serving test");
 });
 
+http.listen(3000, function(){
+	console.log('listening on *:3000');
+});
 
+///SERVER IMPLEMENTATION STARTS
+var pid = 123;
 io.on('connection', function(socket){
 	console.log('a user connected');
+	socket.id = pid++;
+	socket.emit('init', {id: socket.id});
 	socket.on('chat_message', function(text){
 		if(text==="") return;
 		console.log("User: "+text);
 		io.emit('message', "User: "+text);
 	});
-});
+	socket.on('moved', function(movement){
+		//TODO check if can move
+		io.emit('playerMoved', {id: socket.id, x: movement.x, y: movement.y});
+	});
 
-http.listen(3000, function(){
-	console.log('listening on *:3000');
 });

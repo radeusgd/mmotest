@@ -6,16 +6,19 @@ function log(text){
    log("Error: "+data);
  }
  var ip = window.location.hostname+":3000";
- log("Connecting to "+ip);
- var socket = io(ip);
- socket.io.reconnectionAttempts(4);
- socket.on("connect_tiemout", error);
- socket.on("connect_error", error);
- socket.on("connect_fail", error);
- socket.on("connect", function(data){
-      log("Connected!");
- });
- setUpSystems();
+ function startNetworking(){
+    log("Connecting to "+ip);
+    socket = io(ip);
+    socket.io.reconnectionAttempts(4);
+    socket.on("connect_tiemout", error);
+    socket.on("connect_error", error);
+    socket.on("connect_fail", error);
+    socket.on("connect", function(data){
+         log("Connected!");
+         setUpProtocol();
+    });
+    setUpSystems();
+}
  function setUpSystems(){
    $("#msg").parent().submit(function(){
      if($("#msg").val()==="") return;
@@ -35,7 +38,9 @@ function log(text){
    socket.on("reconnect_failed", function(){
      log("Reconnecting failed. Please try refreshing the page.");
    });
+
    socket.on("message", function(text){
      log(text);
    });
+
  }
