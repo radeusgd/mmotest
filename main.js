@@ -42,6 +42,7 @@ http.listen(3000, function(){
 var chunkSize = 8;
 var layersCount = 7;
 var pid = 123;
+players = [];
 io.on('connection', function(socket){
 	console.log('a user connected');
 	socket.id = pid++;
@@ -53,6 +54,13 @@ io.on('connection', function(socket){
 		x: socket.player.x,
 		y: socket.player.y,//TODO is world pos needed?
 	});
+
+	for(var i=0;i<players.length;i++){
+		sendPlayer(players[i], socket);//send them to me
+	}
+	sendPlayer(socket, io);//send me to all
+
+	players.push(socket);
 	socket.on('chat_message', function(text){
 		if(text==="") return;
 		console.log("User: "+text);
@@ -67,16 +75,26 @@ io.on('connection', function(socket){
 	socket.on('requestChunk', function(pos){
 		//TODO pos.checksum for caching
 		var chunk = generateChunk(pos.x,pos.y);//TODO some saving, caching etc
-		console.log("Sent chunk ",pos.x,", ",pos.y);
-		io.emit('chunk',{
+		//console.log("Sent chunk ",pos.x,", ",pos.y);
+		socket.emit('chunk',{
 			chunk: chunk,
 			x: pos.x,
 			y: pos.y
 		});
 	});
+	socket.on('disconnect', function(){
+		players.splice(players.indexOf(socket),1);//remove
+		io.emit('removePlayer',{id: socket.id});
+		console.log("Player disconnected");
+	});
+
 
 });
 
+function sendPlayer(who, to){
+	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y});
+	//TODO set clothes
+}
 
 function localChunkPosToArray(x,y,z){
 	return x+y*chunkSize+z*chunkSize*chunkSize;

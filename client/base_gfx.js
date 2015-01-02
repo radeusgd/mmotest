@@ -3,6 +3,7 @@ allPlayers = [];
 playerSpeed = tileSize*0.7;
 function createPlayer(x,y){
    var player = game.add.sprite(x,y, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
+   player.anchor.x = player.anchor.y = 0;
    player.depth = 200;
    player.previous = player.position;
    player.target = {x:x, y:y};
@@ -27,6 +28,9 @@ function animate(player){
       var dy = player.target.y - player.y;
       var len = Math.sqrt(dx*dx+dy*dy);
       var spd=playerSpeed/game.time.fps;
+      if(len>chunkSize*tileSize){
+         len = 0.2*chunkSize*tileSize;//make big errors compensate quickly
+      }
       dx= (dx/len)*spd;
       dy= (dy/len)*spd;
       player.x += dx;
@@ -39,7 +43,11 @@ function animate(player){
    else if(vx<-0.1){player.animations.play("walkLeft");}
    else if(vy>0){player.animations.play("walkDown");}
    else if(vy<0){player.animations.play("walkUp");}
-   else{player.animations.play("idle");}
+   else{
+      if(player!=window.player || window.player.canMove){//local player jitter anim hack
+         player.animations.play("idle");
+      }
+   }
 
    player.previous = {x:player.x,y:player.y};
 }
@@ -94,7 +102,7 @@ window.onload = function() {
          if(!player.canMove){
             setTimeout(function(){
                player.canMove = true;
-            }, 998*(playerSpeed/tileSize));
+            }, 900*(playerSpeed/tileSize));
          }
       }
    }
