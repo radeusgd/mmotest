@@ -3,8 +3,8 @@ var Database = function(){
    this.db = new Engine.Db('./database.db', {});
 };
 
-Database.prototype.test = function(){
-      console.log("TEST");
+Database.prototype.register = function(username, password, res){
+      res.send('hi from DB');
 };
 
 module.exports = function(){

@@ -1,5 +1,5 @@
 var chunkSize = 8;
-var layersCount = 5;//TODO how many?
+var layersCount = 7;//TODO how many?
 
 var World = function(database){
    this.db = database;

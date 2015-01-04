@@ -38,10 +38,19 @@ rl.on('line', function(line) {
 rl.on('close',function(){
     process.exit(0);
 });
-
+var bodyparser = require('body-parser');
 app.use(express.static(__dirname + '/client'));
-app.get('/dynamictest', function(req, res){
-	console.log("Dynamic content serving test");
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({extended:true}));
+app.get('/register', function(req, res){
+	res.sendFile('client/register.html', {root:__dirname});
+});
+app.post('/register', function(req, res){
+	if(req.param('submit', 'nope')=='nope' || req.param('username', '~~~')=='~~~' || req.param('password', '~~~')=='~~~'){
+		res.sendFile('client/register.html', {root:__dirname});
+		return;
+	}
+	db.register(req.param('username'), req.param('password'), res);
 });
 
 http.listen(3000, function(){
