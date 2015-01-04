@@ -4,6 +4,12 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var db = require('./database.js')();//auth, inventory, ?
+var world = require('./world.js')(db);//terrain, editing, collision
+//TODO NPCs system/mobs, ?
+
+world.test();
+
 var rl = readline.createInterface(process.stdin, process.stdout);
 rl.setPrompt('$> ');
 rl.prompt();
