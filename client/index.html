@@ -2,22 +2,18 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>RPG game Beta</title>
+<title>Login to the best game</title>
 
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="phaser.js"></script><!--<script src="phaser.min.js"></script>-->
-<script src="/socket.io/socket.io.js"></script>
+
 </head>
 <body>
-	<div id="game"></div>
-	<div style="border:1pt;">
-	<form action="">Debug console:<input id="msg" type="text" size="100"></form>
-	<div id="debug" style="background:#AAAAAA;height:100pt;overflow:auto;"></div>
-	</div>
-	<script src="/netProtocol.js"></script>
-	<script src="/base_net.js"></script>
-	<script src="/chunk.js"></script>
-	<script src="/terrain.js"></script>
-	<script src="/base_gfx.js"></script>
+   Login
+   <form action="/game.html" method="GET">
+      <!-- TODO: email, antibot -->
+      <label for="username">Username: </label><input type="text" name="username"><br>
+      <label for="password">Password: </label><input type="password" name="password"><br>
+      <input name="submit" type="submit" value="Login">
+   </form>
 </body>
 </html>

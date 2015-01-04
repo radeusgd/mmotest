@@ -6,9 +6,15 @@ function serverToLocalPos(x,y){
          y: (y-currentTerrainPos.y*chunkSize)*tileSize,
    };
 }
+authenticated = false;
 protocolInitialized = false;
 function setUpProtocol(){
+   socket.on('authFailed', function(){
+      alert("Authentication failed");
+      authenticated = false;
+   });
    socket.on('init', function(data){
+      authenticated = true;
       player.id = data.id;
       player.x = data.x*tileSize;
       player.target.x = data.x*tileSize;

@@ -18,6 +18,9 @@ function log(text){
          if(!protocolInitialized){
             setUpProtocol();
          }
+         var queryDict = {};//log in
+         location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1];});
+         socket.emit('auth', {username: queryDict.username, password: queryDict.password});
     });
     setUpSystems();
 }

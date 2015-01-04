@@ -115,6 +115,8 @@ window.onload = function() {
       }
    }
    function update(){
+      if(!authenticated) return;
+
       //player.body.velocity.x = 0;player.body.velocity.y = 0;
       controls();
       allPlayers.forEach(animate);
@@ -124,5 +126,8 @@ window.onload = function() {
    }
    function render(){
       game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+      if(!authenticated){
+         game.debug.text("Waiting for authentication", 50, 200, "#ffff30");
+      }
    }
 };

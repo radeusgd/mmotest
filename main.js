@@ -59,12 +59,31 @@ http.listen(3000, function(){
 
 ///SERVER IMPLEMENTATION STARTS
 
-var pid = 123;
+//var pid = 123;
 players = [];
 io.on('connection', function(socket){
 	console.log('Player joined, ip:', socket.request.connection.remoteAddress);
+	socket.on('auth', function(data){
+		if(socket.player===undefined){
+			db.authenticate(data.username, data.password,
+			function(id){
+				initPlayer(socket, id);
+				console.log(socket.id, 'successfully authenticated');
+			},
+			function(){
+				socket.emit('authFailed');
+			});
+		}else{
+			console.log("Player already authenticated");
+		}
+	});
+
+	//socket.emit("authRequest");//user should initialize auth
+});
+
+function initPlayer(socket,id){
 	say("Player joined");
-	socket.id = pid++;
+	socket.id = id;
 	socket.player = {};
 	socket.player.x = 3.5*world.chunkSize;
 	socket.player.y = 3.5*world.chunkSize;
@@ -109,8 +128,7 @@ io.on('connection', function(socket){
 		console.log("Player disconnected");
 	});
 
-
-});
+}
 
 function say(text){
 	io.emit('message', text);
