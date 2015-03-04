@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db);//terrain, editing, collision
 //TODO NPCs system/mobs, ?
@@ -119,8 +120,10 @@ function initPlayer(socket,id,username){
 		//TODO pos.checksum for caching
 		world.getChunk(pos.x,pos.y, function(chunk){
 			//console.log("Sent chunk ",pos.x,", ",pos.y);
+			var compressed = utils.compressChunk(chunk);
+			//console.log("Transferring "+compressed.length+" bytes");
 			socket.emit('chunk',{
-				chunk: chunk,
+				chunk: compressed,
 				x: pos.x,
 				y: pos.y
 			});
@@ -129,8 +132,9 @@ function initPlayer(socket,id,username){
 	socket.on('placeBlock', function(data){
 		world.setBlockAtPosition(socket.player.x+data.x,socket.player.y+data.y,data.z,data.id, function(x,y,chunk){
 			//resend the chunk
+			var compressed = utils.compressChunk(chunk);
 			io.emit('chunk',{
-				chunk: chunk,
+				chunk: compressed,
 				x: x,
 				y: y
 			});

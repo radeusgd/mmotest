@@ -1,5 +1,19 @@
 pendingTransfers = {};
 
+function str2ab(str) {
+   //var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+   var bufView = new Uint16Array(str.length);
+   for (var i=0, strLen=str.length; i<strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+   }
+   return bufView;
+}
+var compressor = new LZ77();
+function decompressChunk(chunk){
+   return str2ab(compressor.decompress(chunk));
+}
+
+
 function serverToLocalPos(x,y){
    return {
          x: (x-currentTerrainPos.x*chunkSize)*tileSize,
@@ -69,7 +83,7 @@ function setUpProtocol(){
       //TODO: cache
       var x = data.x;
       var y = data.y;
-      onChunkReceived(data.chunk, {x:x,y:y});
+      onChunkReceived(decompressChunk(data.chunk), {x:x,y:y});
       delete pendingTransfers[(x)+'x'+(y)];
    });
    socket.on('chat_message', function(data){
