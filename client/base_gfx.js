@@ -1,6 +1,6 @@
 
 allPlayers = [];
-playerSpeed = tileSize*0.7;
+playerSpeed = tileSize*1.8;
 function createPlayer(x,y){
    var player = game.add.sprite(x,y, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
    player.anchor.x = player.anchor.y = 0;
@@ -125,7 +125,15 @@ window.onload = function() {
       game.world.sort('depth');
    }
    function render(){
-      game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+      var fps = "--";
+      var png = "No connection";
+      if(game.time.fps){
+         fps = game.time.fps+"fps";
+      }
+      if(ping){
+         png = ping+"ms";
+      }
+      game.debug.text(fps+" | "+png, 2, 14, "#ffff00",'bold 16px Courier');
       if(!authenticated){
          game.debug.text("Waiting for authentication", 50, 200, "#ffff30");
       }

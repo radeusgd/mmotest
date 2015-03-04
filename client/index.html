@@ -5,14 +5,22 @@
 <title>Login to the best game</title>
 
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
+<script>
+$(document).ready(function(){
+   $('#form').submit(function() {
+      $('#pass').val(CryptoJS.SHA1($('#pass').val()));
+      return true;
+   });
+});
+</script>
 </head>
 <body>
    Login
-   <form action="/game.html" method="GET">
+   <form id="form" action="/game.html" method="GET">
       <!-- TODO: email, antibot -->
       <label for="username">Username: </label><input type="text" name="username"><br>
-      <label for="password">Password: </label><input type="password" name="password"><br>
+      <label for="password">Password: </label><input id="pass" type="password" name="password"><br>
       <input name="submit" type="submit" value="Login">
    </form>
 </body>

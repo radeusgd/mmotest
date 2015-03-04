@@ -6,6 +6,8 @@ function log(text){
    log("Error: "+data);
  }
  var ip = window.location.hostname+":3000";
+ var ping = NaN;
+ var pinged = false;
  function startNetworking(){
     log("Connecting to "+ip);
     socket = io(ip);
@@ -47,5 +49,19 @@ function log(text){
    socket.on("message", function(text){
      log(text);
    });
+   socket.on("ping", function(t){
+      socket.emit("ping",t);
+   });
+   socket.on("pong", function(t){
+      ping = Date.now() - t;
+      pinged=false;
+   });
+   setInterval(function(){
+      if(pinged){
+         ping = NaN;
+      }
+      pinged = true;
+      socket.emit("ping",Date.now());
+   },2300);
 
  }

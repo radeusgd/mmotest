@@ -10,6 +10,8 @@ var World = function(database){
 function localChunkPosToArray(x,y,z){
    return x+y*chunkSize+z*chunkSize*chunkSize;
 }
+
+
 function generateChunk(xx,yy){//temporary function for proc gen
    //console.log("Generating new chunk");
    var chunk = new Uint16Array(chunkSize*chunkSize*layersCount);

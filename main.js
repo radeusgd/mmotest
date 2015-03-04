@@ -99,6 +99,9 @@ function initPlayer(socket,id){
 	sendPlayer(socket, io);//send me to all
 
 	players.push(socket);
+	socket.on("ping", function(t){
+		socket.emit("pong",t);
+	});
 	socket.on('chat_message', function(text){
 		if(text==="") return;
 		console.log("["+socket.id+"] "+text);
