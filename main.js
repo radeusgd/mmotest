@@ -99,6 +99,8 @@ function initPlayer(socket,id,username){
 	}
 	sendPlayer(socket, io);//send me to all
 
+	socket.player.chunk = {};
+
 	players.push(socket);
 	socket.on("ping", function(t){
 		socket.emit("pong",t);
@@ -109,11 +111,16 @@ function initPlayer(socket,id,username){
 		io.emit('chat_message', {id: socket.id, text: text});
 	});
 	socket.on('moved', function(movement){
-		//TODO check if can move
-		//if cannot send him a 'cannotMove' message so he can update his pos appropriately
-		socket.player.x+=movement.x;
-		socket.player.y+=movement.y;
-		io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});
+		canMove(socket.player,movement,function(can){//check if can move
+			if(can){
+			//if cannot send him a 'cannotMove' message so he can update his pos appropriately
+				socket.player.x+=movement.x;
+				socket.player.y+=movement.y;
+				io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});
+			}else{
+				socket.emit('cannotMove',{x: socket.player.x, y: socket.player.y});
+			}
+		});
 	});
 	socket.on('requestChunk', function(pos){
 		//TODO cache
@@ -156,4 +163,29 @@ function say(text){
 function sendPlayer(who, to){
 	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y});
 	//TODO set clothes
+}
+
+var notWalkableTiles = [138,161,249,250,251,226,227,228];
+function isWalkable(tileId){
+	if(notWalkableTiles.indexOf(tileId) != -1) return false;
+	return true;
+}
+
+function canMove(player, movement, callback){
+	var chunkSize = world.chunkSize;
+	if(movement.x+movement.y>1) return false;
+	var pos = {x:Math.floor((player.x+movement.x)/chunkSize),y:Math.floor((player.y+movement.y)/chunkSize)};
+	var check = function(chunk){
+		var chunkPos = {x:player.x+movement.x-pos.x*chunkSize,y:player.y+movement.y-pos.y*chunkSize};
+		if(isWalkable(chunk[chunkPos.x+chunkPos.y*chunkSize+1*chunkSize*chunkSize])){
+			callback(true);
+		}else{
+			callback(false);
+		}
+	};
+	//if(!(player.chunk.x==pos.x && player.chunk.y==pos.y)){
+		world.getChunk(pos.x,pos.y, check);
+	//}else{
+	//	check(player.chunk);//but update breaks it, so maybe not cache it now...
+	//}
 }
