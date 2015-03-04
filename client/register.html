@@ -9,7 +9,7 @@
 <script>
 $(document).ready(function(){
    $('#form').submit(function() {
-      $('#pass').val(CryptoJS.SHA1($('#pass').val()));
+      $('#pass').val(CryptoJS.SHA1("!@#$%"+$('#pass').val()));
       return true;
    });
 });
