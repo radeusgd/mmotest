@@ -67,7 +67,7 @@ io.on('connection', function(socket){
 		if(socket.player===undefined){
 			db.authenticate(data.username, data.password,
 			function(id){
-				initPlayer(socket, id);
+				initPlayer(socket, id, data.username);
 				console.log(data.username+" ("+socket.id+") successfully authenticated");
 			},
 			function(){
@@ -81,7 +81,7 @@ io.on('connection', function(socket){
 	//socket.emit("authRequest");//user should initialize auth
 });
 
-function initPlayer(socket,id){
+function initPlayer(socket,id,username){
 	say("Player joined");
 	socket.id = id;
 	socket.player = {};
@@ -104,7 +104,7 @@ function initPlayer(socket,id){
 	});
 	socket.on('chat_message', function(text){
 		if(text==="") return;
-		console.log("["+socket.id+"] "+text);
+		console.log("["+username+"/"+socket.id+"] "+text);
 		io.emit('chat_message', {id: socket.id, text: text});
 	});
 	socket.on('moved', function(movement){
@@ -123,6 +123,16 @@ function initPlayer(socket,id){
 				chunk: chunk,
 				x: pos.x,
 				y: pos.y
+			});
+		});
+	});
+	socket.on('placeBlock', function(data){
+		world.setBlockAtPosition(socket.player.x+data.x,socket.player.y+data.y,data.z,data.id, function(x,y,chunk){
+			//resend the chunk
+			io.emit('chunk',{
+				chunk: chunk,
+				x: x,
+				y: y
 			});
 		});
 	});

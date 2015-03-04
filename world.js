@@ -42,6 +42,16 @@ World.prototype.getChunk = function(x,y, callback){
    });
 };
 
+World.prototype.setBlockAtPosition = function(x,y,z,id, resendChunk){
+   var db = this.db;//for closure
+   var pos = {x:Math.floor(x/chunkSize),y:Math.floor(y/chunkSize)};
+   this.getChunk(pos.x,pos.y, function(chunk){
+      chunk[localChunkPosToArray(x-pos.x*chunkSize,y-pos.y*chunkSize,z)] = id;
+      db.updateChunk(pos.x,pos.y,chunk);
+      resendChunk(pos.x,pos.y,chunk);
+   });
+};
+
 module.exports = function(db){
    return new World(db);
 };

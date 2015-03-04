@@ -112,3 +112,7 @@ function requestChunk(x,y){
 function sendMoved(dx,dy){
    socket.emit('moved', {x:dx,y:dy});
 }
+
+function sendPlaceBlock(x,y,layer,id){
+   socket.emit('placeBlock',{x:x,y:y,z:layer,id:id});
+}

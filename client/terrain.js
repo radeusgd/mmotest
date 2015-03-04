@@ -68,6 +68,11 @@ function onChunkReceived(chunk, pos){
    if(pos.x>=currentTerrainPos.x && pos.x<currentTerrainPos.x+7 && pos.y>=currentTerrainPos.y && pos.y<currentTerrainPos.y+7){
       var x = pos.x - currentTerrainPos.x;
       var y = pos.y - currentTerrainPos.y;
+      if(terrain[x+y*7]){
+         for(var i=0;i<layersCount;i++){
+            terrain[x+y*7][i].destroy(true);
+         }
+      }
       terrain[x+y*7] = makeWorldChunk(chunk, x,y);
    }
 }
