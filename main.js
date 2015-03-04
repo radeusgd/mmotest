@@ -68,7 +68,7 @@ io.on('connection', function(socket){
 			db.authenticate(data.username, data.password,
 			function(id){
 				initPlayer(socket, id);
-				console.log(socket.id, 'successfully authenticated');
+				console.log(data.username+" ("+socket.id+") successfully authenticated");
 			},
 			function(){
 				socket.emit('authFailed');
@@ -112,13 +112,15 @@ function initPlayer(socket,id){
 		io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});
 	});
 	socket.on('requestChunk', function(pos){
+		//TODO cache
 		//TODO pos.checksum for caching
-		var chunk = world.getChunk(pos.x,pos.y);
-		//console.log("Sent chunk ",pos.x,", ",pos.y);
-		socket.emit('chunk',{
-			chunk: chunk,
-			x: pos.x,
-			y: pos.y
+		world.getChunk(pos.x,pos.y, function(chunk){
+			//console.log("Sent chunk ",pos.x,", ",pos.y);
+			socket.emit('chunk',{
+				chunk: chunk,
+				x: pos.x,
+				y: pos.y
+			});
 		});
 	});
 	socket.on('disconnect', function(){

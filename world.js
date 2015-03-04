@@ -11,6 +11,7 @@ function localChunkPosToArray(x,y,z){
    return x+y*chunkSize+z*chunkSize*chunkSize;
 }
 function generateChunk(xx,yy){//temporary function for proc gen
+   //console.log("Generating new chunk");
    var chunk = new Uint16Array(chunkSize*chunkSize*layersCount);
    for(var x=0;x<chunkSize;x++){
       for(var y=0;y<chunkSize;y++){
@@ -27,10 +28,16 @@ function generateChunk(xx,yy){//temporary function for proc gen
    return chunk;
 }
 
-World.prototype.getChunk = function(x,y){
-   //TODO check if db has modified
-   //if  not
-   return generateChunk(x,y);//TODO cache
+World.prototype.getChunk = function(x,y, callback){
+   var db = this.db;
+   db.getChunk(x,y,function(chunk){//success
+      callback(chunk);
+   },
+   function(){//fail
+      var chunk = generateChunk(x,y);
+      db.updateChunk(x,y,chunk);
+      callback(chunk);
+   });
 };
 
 module.exports = function(db){
