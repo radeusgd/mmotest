@@ -1,1 +1,1 @@
-nodemon main.js --ignore 'client/*' --ignore 'database.db/*'
+nodemon main.js --ignore 'client/' --ignore 'database.db/'

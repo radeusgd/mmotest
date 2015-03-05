@@ -19,7 +19,19 @@
 <body>
 	<div id="game"></div>
 	<div id="controls">
-		<input id="blockLayer" min="0" max="4" value="0"><input type="text" id="blockId" value="44"><button onclick="placeBlock()">Place block</button><button onclick="destroyBlock()">Destroy block</button>
+		<select id="blockLayer">
+				<option value="0">0</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+		</select>
+		<input type="text" id="blockId" value="44">
+		<select id="blockAction">
+			<option value="none">None</option>
+			<option value="place">Place block</option>
+			<option value="destroy">Destroy block</option>
+		</select>
 	</div>
 	<div style="border:1pt;">
 	<br>

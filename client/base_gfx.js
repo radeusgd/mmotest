@@ -62,6 +62,7 @@ window.onload = function() {
    function create () {
       game.stage.backgroundColor = '#222235';
       cursors = game.input.keyboard.createCursorKeys();
+      game.input.mouse.mouseDownCallback = genericOnMouseDown;
 
       game.world.setBounds(0,0,7*chunkSize*tileSize,7*chunkSize*tileSize);
 

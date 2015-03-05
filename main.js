@@ -165,7 +165,7 @@ function sendPlayer(who, to){
 	//TODO set clothes
 }
 
-var notWalkableTiles = [138,161,249,250,251,226,227,228];
+var notWalkableTiles = [138,161,249,250,251,226,227,228,486];
 function isWalkable(tileId){
 	if(notWalkableTiles.indexOf(tileId) != -1) return false;
 	return true;
@@ -177,7 +177,7 @@ function canMove(player, movement, callback){
 	var pos = {x:Math.floor((player.x+movement.x)/chunkSize),y:Math.floor((player.y+movement.y)/chunkSize)};
 	var check = function(chunk){
 		var chunkPos = {x:player.x+movement.x-pos.x*chunkSize,y:player.y+movement.y-pos.y*chunkSize};
-		if(isWalkable(chunk[chunkPos.x+chunkPos.y*chunkSize+1*chunkSize*chunkSize])){
+		if(isWalkable(chunk[chunkPos.x+chunkPos.y*chunkSize+1*chunkSize*chunkSize]) && isWalkable(chunk[chunkPos.x+chunkPos.y*chunkSize+0*chunkSize*chunkSize])){
 			callback(true);
 		}else{
 			callback(false);
