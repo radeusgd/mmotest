@@ -94,14 +94,14 @@ function initPlayer(socket,id,username){
 		y: socket.player.y,//TODO is world pos needed?
 	});
 
+	players.push(socket);
 	for(var i=0;i<players.length;i++){
 		sendPlayer(players[i], socket);//send them to me
 	}
+	socket.player.username = username;
 	sendPlayer(socket, io);//send me to all
-
 	socket.player.chunk = {};
 
-	players.push(socket);
 	socket.on("ping", function(t){
 		socket.emit("pong",t);
 	});
@@ -161,8 +161,8 @@ function say(text){
 }
 
 function sendPlayer(who, to){
-	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y});
-	//TODO set clothes
+	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y, name: who.player.username});
+	//TODO set clothes etc
 }
 
 var notWalkableTiles = [138,161,249,250,251,226,227,228,486];

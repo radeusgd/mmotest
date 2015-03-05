@@ -38,11 +38,18 @@ function setUpProtocol(){
    });
    socket.on('addPlayer', function(data){
       //console.log(data);
-      if(data.id==player.id) return;//it's me hey
+      if(data.id==player.id){
          //TODO if it's me I can still download clothing here!!
+         player.name = data.name;
+         updatePlayer(player);
+         return;//it's me hey
+      }
       var pos = serverToLocalPos(data.x, data.y);
       var p = createPlayer(pos.x,pos.y);
       p.id = data.id;
+      p.name = data.name;
+      //log("Joins: "+data.name);
+      updatePlayer(p);
    });
    socket.on('removePlayer', function(data){
       //console.log("removing", data);
@@ -87,13 +94,13 @@ function setUpProtocol(){
       delete pendingTransfers[(x)+'x'+(y)];
    });
    socket.on('chat_message', function(data){
-      log("["+data.id+"] "+data.text);
       var sayer;
       for(var i=0;i<allPlayers.length;i++){
          if(allPlayers[i].id==data.id){
             sayer = allPlayers[i];
          }
       }
+      log("["+(sayer.name || data.id)+"] "+data.text);
       var txt = game.add.text(sayer.x, sayer.y, data.text, {fontSize: 12, fill: '#ffff10', stroke: '#000000', strokeThickness: 5});
       var anim = game.add.tween(txt);
       anim.to({y: sayer.y-tileSize, alpha: 0}, 1500, Phaser.Easing.Linear.None, true, 2000);

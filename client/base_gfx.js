@@ -11,6 +11,14 @@ function createPlayer(x,y){
    allPlayers.push(player);
    return player;
 }
+function updatePlayer(player){
+  if(player.nameText){
+    player.nameText.destroy(true);
+  }
+  player.nameText = game.add.text(tileSize/2,tileSize,player.name,{fontSize: 4, fill: '#ffff10', stroke: '#000000', strokeThickness: 2});
+  player.nameText.anchor = {x:0.5,y:0};
+  player.addChild(player.nameText);
+}
 function preparePlayerAnimations(player){
    //set-up player anims
    player.animations.add("idle", [130],1,true);

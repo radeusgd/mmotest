@@ -11,7 +11,7 @@ function log(text){
  function startNetworking(){
     log("Connecting to "+ip);
     socket = io(ip);
-    socket.io.reconnectionAttempts(4);
+    socket.io.reconnectionAttempts(10);
     socket.on("connect_tiemout", error);
     socket.on("connect_error", error);
     socket.on("connect_fail", error);
