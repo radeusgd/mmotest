@@ -15,7 +15,7 @@ Database.prototype.register = function(username, password, res){
             res.send("An error occured");
             console.dir(err);
          }else{
-            res.send("Registration successfull, you can now log in");
+            res.send("Registration successfull, you can now <a href=\"/\">log in</a>.");
          }
       });
 };
