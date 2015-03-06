@@ -66,13 +66,15 @@ function setUpProtocol(){
    });
    socket.on('playerMoved', function(data){
       //console.log(data);
+      var pos = serverToLocalPos(data.x, data.y);
       if(data.id==player.id){
-         return;//if it's me I don't care unless I get 'cannotMove'
+         //still update my target
+         player.target.x = pos.x;
+         player.target.y = pos.y;
+         return;
       }
       allPlayers.forEach(function(player){
             if(player.id == data.id){
-               //TODO world->local
-               var pos = serverToLocalPos(data.x, data.y);
                player.target.x = pos.x;
                player.target.y = pos.y;
             }
@@ -103,10 +105,19 @@ function setUpProtocol(){
       log("["+(sayer.name || data.id)+"] "+data.text);
       var txt = game.add.text(sayer.x, sayer.y, data.text, {fontSize: 12, fill: '#ffff10', stroke: '#000000', strokeThickness: 5});
       var anim = game.add.tween(txt);
-      anim.to({y: sayer.y-tileSize, alpha: 0}, 1500, Phaser.Easing.Linear.None, true, 2000);
       anim.onComplete.add(function(){
          txt.destroy(true);
       });
+      anim.to({y: sayer.y-tileSize, alpha: 0}, 1500, Phaser.Easing.Linear.None, true, 2000);
+   });
+   socket.on('message', function(message){
+      var txt = game.add.text(10, 680, message, {fontSize: 12, fill: '#ff9a10', stroke: '#000000', strokeThickness: 4});
+      txt.fixedToCamera = true;
+      var anim = game.add.tween(txt);
+      anim.onComplete.add(function(){
+         txt.destroy(true);
+      });
+      anim.to({y: 680-tileSize, alpha: 0}, 1500, Phaser.Easing.Linear.None, true, 2000);
    });
 
    protocolInitialized = true;

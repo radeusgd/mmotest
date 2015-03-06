@@ -65,7 +65,7 @@ players = [];
 io.on('connection', function(socket){
 	console.log('Player joined, ip:', socket.request.connection.remoteAddress);
 	socket.on('auth', function(data){
-		if(socket.player===undefined){
+		if(socket.player===undefined){//TODO check auth id for dups
 			db.authenticate(data.username, data.password,
 			function(id){
 				initPlayer(socket, id, data.username);
@@ -83,7 +83,6 @@ io.on('connection', function(socket){
 });
 
 function initPlayer(socket,id,username){
-	say("Player joined");
 	socket.id = id;
 	socket.player = {};
 	socket.player.x = 3.5*world.chunkSize;
@@ -99,6 +98,7 @@ function initPlayer(socket,id,username){
 		sendPlayer(players[i], socket);//send them to me
 	}
 	socket.player.username = username;
+	say("Player "+username+" joined");
 	sendPlayer(socket, io);//send me to all
 	socket.player.chunk = {};
 
@@ -149,7 +149,7 @@ function initPlayer(socket,id,username){
 	});
 	socket.on('disconnect', function(){
 		players.splice(players.indexOf(socket),1);//remove
-		say("Player disconnected");
+		say("Player "+socket.username+" disconnected");
 		io.emit('removePlayer',{id: socket.id});
 		console.log("Player disconnected");
 	});
