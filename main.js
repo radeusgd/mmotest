@@ -30,6 +30,18 @@ serverConsole.on('list',function(words){
 		}
 	}
 });
+serverConsole.on('tp',function(words){
+	var p1 = findPlayer(words[1]);
+	var p2 = findPlayer(words[2]);
+	if(p1 && p2){
+		p1.player.x=p2.player.x;
+		p1.player.y=p2.player.y;
+		io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
+		console.log("Teleported");
+	}else{
+		console.log("Wrong player name");
+	}
+});
 
 var bodyparser = require('body-parser');
 app.use(express.static(__dirname + '/client'));
@@ -181,4 +193,10 @@ function canMove(player, movement, callback){
 	//}else{
 	//	check(player.chunk);//but update breaks it, so maybe not cache it now...
 	//}
+}
+function findPlayer(username){
+	for(var i=0;i<players.length;i++){
+		if(players[i].player.username==username) return players[i];
+	}
+	return undefined;
 }
