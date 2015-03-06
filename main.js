@@ -1,4 +1,4 @@
-var readline = require('readline');
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -10,35 +10,27 @@ var world = require('./world.js')(db);//terrain, editing, collision
 //TODO NPCs system/mobs, ?
 
 
-var rl = readline.createInterface(process.stdin, process.stdout);
-rl.setPrompt('$> ');
-rl.prompt();
-rl.on('line', function(line) {
-	words = line.split(" ");
-	switch(words[0]){
-		case "say":
-			var message = "[SERVER] "+words.slice(1).join(" ");
-			say(message);
-			console.log(message);
-		break;
-		case "stop":
-			io.emit('disconnecting', "Server shutting down");
-			rl.close();
-		break;
-		case "list":
-			console.log("Players:");
-			for(var i=0;i<players.length;i++){
-					console.log("(",players[i].id,") - ", players[i].request.connection.remoteAddress);
-			}
-		break;
-		default:
-			//console.log("Invalid command");
+var serverConsole = require('./console')();
+serverConsole.on('say',function(words){
+	var message = "[SERVER] "+words.slice(1).join(" ");
+	say(message);
+	console.log(message);
+});
+serverConsole.on('stop',function(words){
+	io.emit('disconnecting', "Server shutting down");
+	process.exit(0);
+});
+serverConsole.on('list',function(words){
+	if(players.length===0){
+		console.log("No players connected");
+	}else{
+		console.log("Players:");
+		for(var i=0;i<players.length;i++){
+			console.log(players[i].player.username+" (",players[i].id,") - ", players[i].ip);
+		}
 	}
-	rl.prompt();
 });
-rl.on('close',function(){
-    process.exit(0);
-});
+
 var bodyparser = require('body-parser');
 app.use(express.static(__dirname + '/client'));
 app.use(bodyparser.json());
@@ -98,6 +90,7 @@ function initPlayer(socket,id,username){
 		sendPlayer(players[i], socket);//send them to me
 	}
 	socket.player.username = username;
+	socket.ip = socket.request.connection.remoteAddress;
 	say("Player "+username+" joined");
 	sendPlayer(socket, io);//send me to all
 	socket.player.chunk = {};
@@ -149,7 +142,7 @@ function initPlayer(socket,id,username){
 	});
 	socket.on('disconnect', function(){
 		players.splice(players.indexOf(socket),1);//remove
-		say("Player "+socket.username+" disconnected");
+		if(socket.username) say("Player "+socket.username+" disconnected");
 		io.emit('removePlayer',{id: socket.id});
 		console.log("Player disconnected");
 	});
