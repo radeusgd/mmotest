@@ -10,40 +10,40 @@ var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db);//terrain, editing, collision
 //TODO NPCs system/mobs, ?
 
-
-var serverConsole = require('./console')();
-serverConsole.on('say',function(words){
-	var message = "[SERVER] "+words.slice(1).join(" ");
-	say(message);
-	console.log(message);
-});
-serverConsole.on('stop',function(words){
-	io.emit('disconnecting', "Server shutting down");
-	process.exit(0);
-});
-serverConsole.on('list',function(words){
-	if(players.length===0){
-		console.log("No players connected");
-	}else{
-		console.log("Players:");
-		for(var i=0;i<players.length;i++){
-			console.log(players[i].player.username+" (",players[i].id,") - ", players[i].ip);
+if(config.interactive){//only if interactive is set
+	var serverConsole = require('./console')();
+	serverConsole.on('say',function(words){
+		var message = "[SERVER] "+words.slice(1).join(" ");
+		say(message);
+		console.log(message);
+	});
+	serverConsole.on('stop',function(words){
+		io.emit('disconnecting', "Server shutting down");
+		process.exit(0);
+	});
+	serverConsole.on('list',function(words){
+		if(players.length===0){
+			console.log("No players connected");
+		}else{
+			console.log("Players:");
+			for(var i=0;i<players.length;i++){
+				console.log(players[i].player.username+" (",players[i].id,") - ", players[i].ip);
+			}
 		}
-	}
-});
-serverConsole.on('tp',function(words){
-	var p1 = findPlayer(words[1]);
-	var p2 = findPlayer(words[2]);
-	if(p1 && p2){
-		p1.player.x=p2.player.x;
-		p1.player.y=p2.player.y;
-		io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
-		console.log("Teleported");
-	}else{
-		console.log("Wrong player name");
-	}
-});
-
+	});
+	serverConsole.on('tp',function(words){
+		var p1 = findPlayer(words[1]);
+		var p2 = findPlayer(words[2]);
+		if(p1 && p2){
+			p1.player.x=p2.player.x;
+			p1.player.y=p2.player.y;
+			io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
+			console.log("Teleported");
+		}else{
+			console.log("Wrong player name");
+		}
+	});
+}
 var bodyparser = require('body-parser');
 app.use(express.static(__dirname + '/client'));
 app.use(bodyparser.json());
