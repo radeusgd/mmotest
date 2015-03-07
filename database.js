@@ -21,7 +21,8 @@ Database.prototype.register = function(username, password, res){
 };
 
 Database.prototype.authenticate = function(username, password, success, fail){
-   //TODO hash the password, for now its experiments so yeah
+   //should I hash the password, for now its experiments so yeah
+   //the password is already hashed in JS clientside
    this.accounts.findOne({username: username, password: password}, function(err, item){
       if(err){
          fail();
@@ -29,6 +30,23 @@ Database.prototype.authenticate = function(username, password, success, fail){
       }
       success(item._id);//TODO in mongo this won't be int32, so fix it
    });
+};
+
+Database.prototype.ifHasAdminPrivileges = function(player, callback){
+   this.accounts.findOne({username: player.player.username}, function(err, item){
+      if(err){
+         //console.log("Privilege query: Error "+err);
+         return;
+      }
+      if((""+item._id)==(""+player.id)){
+         if(item.isAdmin===true) callback(player);
+         //else console.log("Privilege query: Player is not an admin");
+      }//else{console.log("Privilege query: Id mismatch! "+item._id+"!="+player.id);}
+   });
+};
+
+Database.prototype.setAdminPrivileges = function(player, settingAdmin){
+   this.accounts.update({username: player.player.username}, { $set: { isAdmin: settingAdmin }});
 };
 /////////////////////TERRAIN
 

@@ -10,40 +10,54 @@ var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db);//terrain, editing, collision
 //TODO NPCs system/mobs, ?
 
-if(config.interactive){//only if interactive is set
-	var serverConsole = require('./console')();
-	serverConsole.on('say',function(words){
-		var message = "[SERVER] "+words.slice(1).join(" ");
-		say(message);
-		console.log(message);
-	});
-	serverConsole.on('stop',function(words){
-		io.emit('disconnecting', "Server shutting down");
-		process.exit(0);
-	});
-	serverConsole.on('list',function(words){
-		if(players.length===0){
-			console.log("No players connected");
-		}else{
-			console.log("Players:");
-			for(var i=0;i<players.length;i++){
-				console.log(players[i].player.username+" (",players[i].id,") - ", players[i].ip);
-			}
+
+var serverConsole = require('./console')(config.interactive);
+serverConsole.on('say',function(words){
+	var message = "[SERVER] "+words.slice(1).join(" ");
+	say(message);
+	console.log(message);
+});
+serverConsole.on('stop',function(words){
+	io.emit('disconnecting', "Server shutting down");
+	process.exit(0);
+});
+serverConsole.on('list',function(words){
+	if(players.length===0){
+		console.log("No players connected");
+	}else{
+		console.log("Players:");
+		for(var i=0;i<players.length;i++){
+			console.log(players[i].player.username+" (",players[i].id,") - ", players[i].ip);
 		}
-	});
-	serverConsole.on('tp',function(words){
-		var p1 = findPlayer(words[1]);
-		var p2 = findPlayer(words[2]);
-		if(p1 && p2){
-			p1.player.x=p2.player.x;
-			p1.player.y=p2.player.y;
-			io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
-			console.log("Teleported");
+	}
+});
+serverConsole.on('tp',function(words){
+	var p1 = findPlayer(words[1]);
+	var p2 = findPlayer(words[2]);
+	if(p1 && p2){
+		p1.player.x=p2.player.x;
+		p1.player.y=p2.player.y;
+		io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
+		console.log("Teleported");
+	}else{
+		console.log("Wrong player name");
+	}
+});
+serverConsole.on('makeadmin',function(words){
+	var p1 = findPlayer(words[1]);
+	if(p1){
+		if(words[2]=="true"){
+			db.setAdminPrivileges(p1,true);
+			console.log(words[1]+" is now admin");
 		}else{
-			console.log("Wrong player name");
+			db.setAdminPrivileges(p1,false);
+			console.log(words[1]+" is no longer admin");
 		}
-	});
-}
+	}else{
+		console.log("No such player connected");
+	}
+});
+
 var bodyparser = require('body-parser');
 app.use(express.static(__dirname + '/client'));
 app.use(bodyparser.json());
@@ -113,8 +127,18 @@ function initPlayer(socket,id,username){
 	});
 	socket.on('chat_message', function(text){
 		if(text==="") return;
-		console.log("["+username+"/"+socket.id+"] "+text);
-		io.emit('chat_message', {id: socket.id, text: text});
+		if(text[0]=="/"){
+			db.ifHasAdminPrivileges(socket,function(player){
+				if(serverConsole.command(text.substring(1))){
+					player.emit('message',"Command executed");
+				}else{
+					player.emit('message',"No such command");
+				}
+			});
+		}else{
+			console.log("["+username+"/"+socket.id+"] "+text);
+			io.emit('chat_message', {id: socket.id, text: text});
+		}
 	});
 	socket.on('moved', function(movement){
 		canMove(socket.player,movement,function(can){//check if can move
