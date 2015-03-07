@@ -5,7 +5,7 @@ function log(text){
  function error(data){
    log("Error: "+data);
  }
- var ip = window.location.hostname+":3000";
+ var ip = window.location.hostname+":"+window.location.port;
  var ping = NaN;
  var pinged = false;
  function startNetworking(){
