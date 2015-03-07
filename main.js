@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var config = require('./config.js');
 var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db);//terrain, editing, collision
@@ -58,8 +59,8 @@ app.post('/register', function(req, res){
 	db.register(req.param('username'), req.param('password'), res);
 });
 
-http.listen(3000, function(){
-	console.log('listening on *:3000');
+http.listen(config.port, function(){
+	console.log('listening on *:'+config.port);
 });
 
 ///SERVER IMPLEMENTATION STARTS
