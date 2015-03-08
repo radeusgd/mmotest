@@ -9,6 +9,8 @@ var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db);//terrain, editing, collision
 //TODO NPCs system/mobs, ?
+var game = new require('./gameEnvironment.js')(db,world);
+world.game = game;
 
 
 var serverConsole = require('./console')(config.interactive);

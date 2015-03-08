@@ -52,6 +52,10 @@ World.prototype.setBlockAtPosition = function(x,y,z,id, resendChunk){
    });
 };
 
+World.prototype.interact = function(player, x,y){
+   //TODO
+};
+
 module.exports = function(db){
    return new World(db);
 };
