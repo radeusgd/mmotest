@@ -7,10 +7,12 @@ var io = require('socket.io')(http);
 var config = require('./config.js');
 var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
-var world = require('./world.js')(db);//terrain, editing, collision
+var world = require('./world.js')(db,{chunkUpdate:chunkUpdated});//terrain, editing, collision
 //TODO NPCs system/mobs, ?
-var game = new require('./gameEnvironment.js')(db,world);
-world.game = game;
+var scriptenvironment = new require('./scriptEnvironment.js')(db,world);
+var items = require('./itemtypes');
+//console.log(new items["testitem"]());
+world.scriptenvironment = scriptenvironment;
 
 
 var serverConsole = require('./console')(config.interactive);
@@ -103,6 +105,16 @@ io.on('connection', function(socket){
 	//socket.emit("authRequest");//user should initialize auth
 });
 
+function chunkUpdated(x,y,chunk){
+	//resend the chunk
+	var compressed = utils.compressChunk(chunk);
+	io.emit('chunk',{
+		chunk: compressed,
+		x: x,
+		y: y
+	});
+};
+
 function initPlayer(socket,id,username){
 	socket.id = id;
 	socket.player = {};
@@ -123,6 +135,10 @@ function initPlayer(socket,id,username){
 	say("Player "+username+" joined");
 	sendPlayer(socket, io);//send me to all
 	socket.player.chunk = {};
+
+	socket.say = function(message){
+		socket.emit('message',message);
+	};
 
 	socket.on("ping", function(t){
 		socket.emit("pong",t);
@@ -169,15 +185,7 @@ function initPlayer(socket,id,username){
 		});
 	});
 	socket.on('placeBlock', function(data){
-		world.setBlockAtPosition(socket.player.x+data.x,socket.player.y+data.y,data.z,data.id, function(x,y,chunk){
-			//resend the chunk
-			var compressed = utils.compressChunk(chunk);
-			io.emit('chunk',{
-				chunk: compressed,
-				x: x,
-				y: y
-			});
-		});
+		world.setBlockAtPosition(socket.player.x+data.x,socket.player.y+data.y,data.z,data.id);
 	});
 	socket.on('disconnect', function(){
 		players.splice(players.indexOf(socket),1);//remove

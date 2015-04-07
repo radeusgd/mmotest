@@ -1,10 +1,13 @@
 var chunkSize = 8;
 var layersCount = 7;//TODO how many?
 
-var World = function(database){
+var World = function(database, handlers){
    this.db = database;
    this.chunkSize = chunkSize;
    this.layersCount = layersCount;
+   for(var handler in handlers){
+      this[handler] = handlers[handler];
+   }
 };
 
 function localChunkPosToArray(x,y,z){
@@ -42,13 +45,14 @@ World.prototype.getChunk = function(x,y, callback){
    });
 };
 
-World.prototype.setBlockAtPosition = function(x,y,z,id, resendChunk){
+World.prototype.setBlockAtPosition = function(x,y,z,id){
    var db = this.db;//for closure
+   var world = this;
    var pos = {x:Math.floor(x/chunkSize),y:Math.floor(y/chunkSize)};
    this.getChunk(pos.x,pos.y, function(chunk){
       chunk[localChunkPosToArray(x-pos.x*chunkSize,y-pos.y*chunkSize,z)] = id;
       db.updateChunk(pos.x,pos.y,chunk);
-      resendChunk(pos.x,pos.y,chunk);
+      world.chunkUpdate(pos.x,pos.y,chunk);
    });
 };
 
@@ -56,6 +60,6 @@ World.prototype.interact = function(player, x,y){
    //TODO
 };
 
-module.exports = function(db){
-   return new World(db);
+module.exports = function(db, handlers){
+   return new World(db,handlers);
 };
