@@ -6,6 +6,9 @@
     "express": "~4.10.0",
     "body-parser": "~1.10.1",
     "socket.io": "~1.1.0",
-    "tingodb": "~0.3.1"
+   "tingodb": "~0.3.1"
+  },
+  "scripts": {
+     "test": "node main.js test"
   }
 }

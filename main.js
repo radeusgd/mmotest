@@ -14,6 +14,13 @@ var items = require('./itemtypes');
 //console.log(new items["testitem"]());
 world.scriptenvironment = scriptenvironment;
 
+if(process.argv[2]=="test"){
+	console.log("Test mode, shutting down in 5s");
+	setTimeout(function(){
+		process.exit(0);
+	},5000);
+	console.log("[TEST] Shutting down");
+}
 
 var serverConsole = require('./console')(config.interactive);
 serverConsole.on('say',function(words){
