@@ -14,14 +14,6 @@ var items = require('./itemtypes');
 //console.log(new items["testitem"]());
 world.scriptenvironment = scriptenvironment;
 
-if(process.argv[2]=="test"){
-	console.log("Test mode, shutting down in 5s");
-	setTimeout(function(){
-		process.exit(0);
-	},5000);
-	console.log("[TEST] Shutting down");
-}
-
 var serverConsole = require('./console')(config.interactive);
 serverConsole.on('say',function(words){
 	var message = "[SERVER] "+words.slice(1).join(" ");
@@ -121,6 +113,13 @@ app.post('/register', function(req, res){
 
 http.listen(config.port, function(){
 	console.log('listening on *:'+config.port);
+	if(process.argv[2]=="test"){
+		console.log("Test mode, shutting down in 3s");
+		setTimeout(function(){
+			console.log("[TEST] Shutting down");
+			process.exit(0);
+		},3000);
+	}
 });
 
 ///SERVER IMPLEMENTATION STARTS
