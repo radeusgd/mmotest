@@ -6,6 +6,7 @@ var Database = function(){
    this.accounts = this.db.createCollection('accounts');
    this.accounts.ensureIndex( { username: 1 }, { unique: true, dropDups: true } );
    this.terrain = this.db.createCollection('terrain');
+   this.entities = this.db.createCollection('entities');
 };
 ///////////////////////AUTH
 Database.prototype.register = function(username, password, res){
@@ -25,6 +26,7 @@ Database.prototype.authenticate = function(username, password, success, fail){
    //the password is already hashed in JS clientside
    this.accounts.findOne({username: username, password: password}, function(err, item){
       if(err){
+         console.log(err);
          fail();
          return;
       }
@@ -62,6 +64,34 @@ Database.prototype.getChunk = function(x, y, success, fail){
 
 Database.prototype.updateChunk = function(x, y, data){
    this.terrain.update({x:x,y:y},{x:x,y:y,data:utils.ab2str(data)}, {upsert: true});
+};
+
+Database.prototype.getChunkEntities = function(x, y, callback){
+   this.entities.findOne({x:x,y:y}, function(err, entities){
+      if(!err){
+         callback(entities);
+      }
+   });
+};
+
+Database.prototype.updateChunkEntities = function(x, y, entities){
+   this.terrain.update({x:x,y:y},{x:x,y:y,entities:entities}, {upsert: true});
+};
+
+Database.prototype.getPlayerInventory = function(player, callback){
+   this.accounts.findOne({username: player.player.username}, function(err, item){
+      if(err || !item || !item.inventory){
+         console.log(err);
+         callback([]);
+      }
+      else{
+         callback(item.inventory);
+      }
+   });
+};
+
+Database.prototype.setPlayerInventory = function(player, inventory){
+   this.accounts.update({username: player.player.username}, { $set: { inventory: inventory }});
 };
 
 module.exports = function(){

@@ -9,7 +9,7 @@ var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db,{chunkUpdate:chunkUpdated});//terrain, editing, collision
 //TODO NPCs system/mobs, ?
-var scriptenvironment = new require('./scriptEnvironment.js')(db,world);
+var scriptenvironment = require('./scriptEnvironment.js')(db,world);
 var items = require('./itemtypes');
 //console.log(new items["testitem"]());
 world.scriptenvironment = scriptenvironment;
@@ -60,6 +60,41 @@ serverConsole.on('makeadmin',function(words){
 	}else{
 		console.log("No such player connected");
 	}
+});
+serverConsole.on('give',function(words){
+	var player = findPlayer(words[1]);
+	if(player === undefined || items[words[2]]===undefined){
+		console.log("Cannot find player/item");
+		return;
+	}
+	var item = new items[words[2]].item;
+	scriptenvironment.givePlayerItem(item,player);
+	console.log("Item given (probably)");
+});
+serverConsole.on('getitems',function(words){
+	var player = findPlayer(words[1]);
+	if(player === undefined){
+		console.log("Cannot find player");
+		return;
+	}
+	var details = (words[2] == "detailed");
+	scriptenvironment.getPlayerItems(player, function(inventory){
+		console.log("Items of "+player.player.username);
+		for(var i=0;i<inventory.length;++i){
+			if(details){
+				console.log(inventory[i]);
+			}else{
+				if(inventory[i].stackable){
+					console.log(inventory[i].name+": "+inventory[i].amount);
+				}else{
+					console.log(inventory[i].name);
+				}
+			}
+		}
+		if(inventory.length===0){
+			console.log("No items");
+		}
+	});
 });
 
 var bodyparser = require('body-parser');
