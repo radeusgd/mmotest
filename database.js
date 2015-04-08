@@ -26,7 +26,7 @@ Database.prototype.authenticate = function(username, password, success, fail){
    //the password is already hashed in JS clientside
    this.accounts.findOne({username: username, password: password}, function(err, item){
       if(err){
-         console.log(err);
+         //console.log(err);
          fail();
          return;
       }
