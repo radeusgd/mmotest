@@ -80,6 +80,7 @@ window.onload = function() {
       game.camera.follow(player);
 
       startNetworking();
+      prepareUI();
    }
 
    function controls(){
