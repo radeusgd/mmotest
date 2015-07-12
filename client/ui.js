@@ -15,40 +15,16 @@ function genericOnMouseDown(e){
   }
 }
 
-function renderUI(obj, container, id){
-  for(var o of obj){
-    switch (o.type) {
-      case "text":
-        var elem =  $("<span>"+o.text+"</span>");
-        container.append(elem);
-        break;
-      case "closebutton":
-        var elem =  $("<button>X</button>");
-        elem.click(function(){
-          removeUI(id);
-        });
-        container.append(elem);
-        break;
-      case "scroll":
-        var elem =  $("<div style='height:"+o.height+";width:"+o.width+";overflow-y:scroll;'></div>");
-        renderUI(o.content,elem,id);
-        container.append(elem);
-      break;
-      case "frame":
-        var elem =  $("<div style='height:"+o.height+";width:"+o.width+";background-color:"+o.color+";'></div>");//TODO image
-        renderUI(o.content,elem,id);
-        container.append(elem);
-      break;
-      default:;
-    }
-  }
-}
-
-function createUI(obj, id){
-  var e  = $("<div class='draggable'></div>");
+function createUI(src, id){
+  var e  = $("<div class='draggable'><button id='close'>X</button><br>"+src+"</div>");
+  var elem =  $("#close",e);
+  elem.click(function(){
+     removeUI(id);
+  });
+  elem.css('position','relative');
+  elem.css('left','-10px');
   e.attr("id","GUI_"+id);
   e.draggable({cursor:"crosshair",containment:"#game",scroll:false});
-  renderUI(obj,e,id);
   $("#ui").append(e);
 }
 
@@ -57,5 +33,7 @@ function removeUI(id){
 }
 
 function prepareUI(){
-  createUI([{type:"frame",color:"#00AAFF",width:"100px",height:"200px",content:[{type:"text",text:"TEST"},{type:'closebutton'},{type:"scroll",width:"90px",height:"100px",content:[{type:"text",text:"scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>"}]}]}],"inventory");
+  //createUI([{type:"frame",color:"#00AAFF",width:"100px",height:"200px",content:[{type:"text",text:"TEST"},{type:'closebutton'},{type:"scroll",width:"90px",height:"100px",content:[{type:"text",text:"scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>"}]}]}],"inventory");
+  createUI("test","test");
+  createUI("<img src='http://www.google.pl/images/srpr/logo11w.png' width='90px' height='60px'>","img");
 }
