@@ -1,5 +1,8 @@
 var chunkSize = 8;
 var layersCount = 7;//TODO how many?
+var noise = require('./perlin.js');
+
+noise.seed(Math.random());
 
 var World = function(database, handlers){
    this.db = database;
@@ -14,6 +17,19 @@ function localChunkPosToArray(x,y,z){
    return x+y*chunkSize+z*chunkSize*chunkSize;
 }
 
+function getGroundAtPos(x,y){
+   var grass = 47;
+   var sand = [122,168];
+   var perlin = noise.simplex2((x / 30), (y) / 30);
+   var ground = grass;
+   if(perlin>0.5){
+      var s = noise.simplex2(x*5, y*5);
+      if(s>0.5) s=1;
+      else s=0;
+      ground = sand[s];
+   }
+   return ground;
+}
 
 function generateChunk(xx,yy){//temporary function for proc gen
    //console.log("Generating new chunk");
@@ -24,8 +40,10 @@ function generateChunk(xx,yy){//temporary function for proc gen
             chunk[localChunkPosToArray(x,y,z)]=10000;
          }
          //var tile = 30+x+40*y;
-         chunk[localChunkPosToArray(x,y,0)] = 23*2+1;
-         if(Math.random()>0.8){
+
+         var ground = getGroundAtPos(xx*chunkSize+x,yy*chunkSize+y);
+         chunk[localChunkPosToArray(x,y,0)] = ground;
+         if(ground == 47 && Math.random()>0.9){
             chunk[localChunkPosToArray(x,y,1)] = 23*7;
          }
       }
