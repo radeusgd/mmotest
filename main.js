@@ -8,11 +8,22 @@ var config = require('./config.js');
 var utils = require('./utils');
 var db = require('./database.js')();//auth, inventory, ?
 var world = require('./world.js')(db,{chunkUpdate:chunkUpdated});//terrain, editing, collision
+var inventorymanager = require('./inventory.js')(db);
 //TODO NPCs system/mobs, ?
 var scriptenvironment = require('./scriptEnvironment.js')(db,world);
 var items = require('./itemtypes');
-//console.log(new items["testitem"]());
+var events = require('./events.js')();
+db.events=events;
+world.events=events;
+inventorymanager.events=events;
+scriptenvironment.events=events;
 world.scriptenvironment = scriptenvironment;
+
+events.addEvent("inventoryUpdated",function(socket){
+	inventorymanager.prepareInventoryCode(socket,function(code){
+		socket.emit('updateInventory',code);
+	});
+});
 
 var serverConsole = require('./console')(config.interactive);
 serverConsole.on('say',function(words){
@@ -137,6 +148,7 @@ io.on('connection', function(socket){
 			},
 			function(){
 				socket.emit('authFailed');
+				console.log('authFailed for player ',socket.request.connection.remoteAddress);
 			});
 		}else{
 			console.log("Player already authenticated");
@@ -154,7 +166,7 @@ function chunkUpdated(x,y,chunk){
 		x: x,
 		y: y
 	});
-};
+}
 
 function initPlayer(socket,id,username){
 	socket.id = id;
@@ -235,6 +247,9 @@ function initPlayer(socket,id,username){
 		console.log("Player disconnected");
 	});
 
+	inventorymanager.prepareInventoryCode(socket,function(code){
+		socket.emit('updateInventory',code);
+	});
 }
 
 function say(text){

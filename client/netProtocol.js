@@ -119,7 +119,13 @@ function setUpProtocol(){
       });
       anim.to({y: 680-tileSize, alpha: 0}, 1500, Phaser.Easing.Linear.None, true, 2000);
    });
-
+   socket.on('updateInventory',function(code){
+      inventoryCode = code;
+      if(inventoryOpen){
+         removeUI("_inventory");
+         createUI(inventoryCode,"_inventory");
+      }
+   });
    protocolInitialized = true;
 }
 

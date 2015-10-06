@@ -15,6 +15,16 @@ function genericOnMouseDown(e){
   }
 }
 
+var inventoryCode = "Loading inventory...";
+var inventoryOpen = false;
+function toggleInventory(){
+   if(!inventoryOpen)
+      createUI(inventoryCode,"_inventory");
+   else
+      removeUI("_inventory");
+   inventoryOpen = !inventoryOpen;
+}
+
 function createUI(src, id){
   var e  = $("<div class='draggable'><button id='close'>X</button><br>"+src+"</div>");
   var elem =  $("#close",e);
@@ -34,6 +44,6 @@ function removeUI(id){
 
 function prepareUI(){
   //createUI([{type:"frame",color:"#00AAFF",width:"100px",height:"200px",content:[{type:"text",text:"TEST"},{type:'closebutton'},{type:"scroll",width:"90px",height:"100px",content:[{type:"text",text:"scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>scrollable<br>"}]}]}],"inventory");
-  createUI("test","test");
-  createUI("<img src='http://www.google.pl/images/srpr/logo11w.png' width='90px' height='60px'>","img");
+  //createUI("test","test");
+  //createUI("<img src='http://www.google.pl/images/srpr/logo11w.png' width='90px' height='60px'>","img");
 }

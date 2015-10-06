@@ -26,7 +26,7 @@ Database.prototype.authenticate = function(username, password, success, fail){
    //the password is already hashed in JS clientside
    this.accounts.findOne({username: username, password: password}, function(err, item){
       if(err){
-         //console.log(err);
+         //console.log("autherror ",err,item);
          fail();
          return;
       }
@@ -91,7 +91,10 @@ Database.prototype.getPlayerInventory = function(player, callback){
 };
 
 Database.prototype.setPlayerInventory = function(player, inventory){
-   this.accounts.update({username: player.player.username}, { $set: { inventory: inventory }});
+   var db = this;
+   this.accounts.update({username: player.player.username}, { $set: { inventory: inventory }},function(){
+      db.events.dispatch("inventoryUpdated",player);
+   });
 };
 
 module.exports = function(){
