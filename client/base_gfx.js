@@ -1,5 +1,5 @@
 
-allPlayers = [];
+allEntities = {};
 playerSpeed = tileSize*1.8;
 function createPlayer(x,y){
    var player = game.add.sprite(x,y, 'player');//game.add.tileSprite(300, 310, 64, 64, 'player');
@@ -8,7 +8,8 @@ function createPlayer(x,y){
    player.previous = player.position;
    player.target = {x:x, y:y};
    preparePlayerAnimations(player);
-   allPlayers.push(player);
+   //allPlayers.push(player);
+   player.type="player";
    return player;
 }
 function updatePlayer(player){
@@ -19,6 +20,16 @@ function updatePlayer(player){
   player.nameText.anchor = {x:0.5,y:0};
   player.addChild(player.nameText);
 }
+function createEntity(x,y,img){
+   var e = game.add.sprite(x,y, 'player');
+   e.anchor.x = e.anchor.y = 0;
+   e.depth = 200;
+   e.previous = e.position;
+   e.target = {x:x, y:y};
+   //   preparePlayerAnimations(player);//TODO
+   e.type="entity";
+   return e;
+}
 function preparePlayerAnimations(player){
    //set-up player anims
    player.animations.add("idle", [130],1,true);
@@ -27,6 +38,31 @@ function preparePlayerAnimations(player){
    player.animations.add("walkDown", [131,132,133,134,135,136,137,138],10,true);
    player.animations.add("walkRight", [144,145,146,147,148,149,150,151],10,true);
    player.animations.play("idle");
+}
+function updateEntity(e){
+   if(e.type=="player"){
+      animate(e);
+      return;
+   }
+   if(e.movementType=="static"){
+      e.x=e.target.x;
+      e.y=e.target.y;
+   }else{
+      if(Math.abs(e.x-e.target.x)>2 || Math.abs(e.y-e.target.y)>2){
+         //we need to move
+         var dx = e.target.x - e.x;
+         var dy = e.target.y - e.y;
+         var len = Math.sqrt(dx*dx+dy*dy);
+         var spd=playerSpeed/game.time.fps;
+         if(len>chunkSize*tileSize){
+            len = 0.2*chunkSize*tileSize;//make big errors compensate quickly
+         }
+         dx= (dx/len)*spd;
+         dy= (dy/len)*spd;
+         e.x += dx;
+         e.y += dy;
+      }
+   }
 }
 function animate(player){
    //movement
@@ -129,7 +165,12 @@ window.onload = function() {
 
       //player.body.velocity.x = 0;player.body.velocity.y = 0;
       controls();
-      allPlayers.forEach(animate);
+      animate(player);
+      for(var id in allEntities){
+         var e = allEntities[id];
+         //console.log(e.x,e.y,e.target);
+         updateEntity(e);
+      }
       updateTerrains();
 
       game.world.sort('depth');

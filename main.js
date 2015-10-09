@@ -25,6 +25,16 @@ events.addEvent("inventoryUpdated",function(socket){
 	});
 });
 
+var freeIDs = [];
+var highestID = 0;
+function allocateID(){
+	if(freeIDs.length>0) return freeIDs.pop();//get an id from recycling
+	return highestID++;
+}
+function freeID(id){
+	freeIDs.push(id);
+}
+
 var serverConsole = require('./console')(config.interactive);
 serverConsole.on('say',function(words){
 	var message = "[SERVER] "+words.slice(1).join(" ");
@@ -51,7 +61,7 @@ serverConsole.on('tp',function(words){
 	if(p1 && p2){
 		p1.player.x=p2.player.x;
 		p1.player.y=p2.player.y;
-		io.emit('playerMoved', {id: p1.id, x: p1.player.x, y: p1.player.y});
+		io.emit('entityMoved', {id: p1.eid, x: p1.player.x, y: p1.player.y});
 		console.log("Teleported");
 	}else{
 		console.log("Wrong player name");
@@ -169,12 +179,13 @@ function chunkUpdated(x,y,chunk){
 }
 
 function initPlayer(socket,id,username){
-	socket.id = id;
+	socket.id = id;//DB id
+	socket.eid = allocateID();//tmp entity ID (for updates)
 	socket.player = {};
 	socket.player.x = 3.5*world.chunkSize;
 	socket.player.y = 3.5*world.chunkSize;
 	socket.emit('init', {
-		id: socket.id,
+		id: socket.eid,
 		x: socket.player.x,
 		y: socket.player.y,//TODO is world pos needed?
 	});
@@ -207,8 +218,8 @@ function initPlayer(socket,id,username){
 				}
 			});
 		}else{
-			console.log("["+username+"/"+socket.id+"] "+text);
-			io.emit('chat_message', {id: socket.id, text: text});
+			console.log("["+username+"/"+socket.id+":"+socket.eid+"] "+text);
+			io.emit('chat_message', {eid: socket.id, text: text});
 		}
 	});
 	socket.on('moved', function(movement){
@@ -217,7 +228,7 @@ function initPlayer(socket,id,username){
 			//if cannot send him a 'cannotMove' message so he can update his pos appropriately
 				socket.player.x+=movement.x;
 				socket.player.y+=movement.y;
-				io.emit('playerMoved', {id: socket.id, x: socket.player.x, y: socket.player.y});
+				io.emit('entityMoved', {id: socket.eid, x: socket.player.x, y: socket.player.y});
 			}else{
 				socket.emit('cannotMove',{x: socket.player.x, y: socket.player.y});
 			}
@@ -243,7 +254,8 @@ function initPlayer(socket,id,username){
 	socket.on('disconnect', function(){
 		players.splice(players.indexOf(socket),1);//remove
 		if(socket.username) say("Player "+socket.username+" disconnected");
-		io.emit('removePlayer',{id: socket.id});
+		io.emit('removeEntity',{id: socket.eid});
+		freeID(socket.eid);
 		console.log("Player disconnected");
 	});
 
@@ -257,7 +269,7 @@ function say(text){
 }
 
 function sendPlayer(who, to){
-	to.emit('addPlayer', {id: who.id, x: who.player.x, y: who.player.y, name: who.player.username});
+	to.emit('addEntity', {id: who.eid, x: who.player.x, y: who.player.y, name: who.player.username, type:"player"});
 	//TODO set clothes etc
 }
 

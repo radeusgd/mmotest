@@ -36,7 +36,8 @@ function setUpProtocol(){
       player.target.y = data.y*tileSize;
       log("Local id set to "+data.id);
    });
-   socket.on('addPlayer', function(data){
+   socket.on('addEntity', function(data){
+      console.log(data.id);
       //console.log(data);
       if(data.id==player.id){
          //TODO if it's me I can still download clothing here!!
@@ -44,27 +45,33 @@ function setUpProtocol(){
          updatePlayer(player);
          return;//it's me hey
       }
-      var pos = serverToLocalPos(data.x, data.y);
-      var p = createPlayer(pos.x,pos.y);
-      p.id = data.id;
-      p.name = data.name;
-      //log("Joins: "+data.name);
-      updatePlayer(p);
+      var pos;
+      if(data.type=='player'){
+         pos = serverToLocalPos(data.x, data.y);
+         var p = createPlayer(pos.x,pos.y);
+         p.id = data.id;
+         p.name = data.name;
+         //log("Joins: "+data.name);
+         updatePlayer(p);
+         allEntities[p.id] = p;
+      }else{
+         //entity
+         pos = serverToLocalPos(data.x, data.y);
+         var e = createEntity(pos.x,pos.y,data.img);
+         e.id = data.id;
+         e.movementType = data.movementType;
+         allEntities[e.id] = e;
+      }
    });
-   socket.on('removePlayer', function(data){
+   socket.on('removeEntity', function(data){
       //console.log("removing", data);
       if(data.id==player.id){
          return;//it's me hey//TODO sure?
       }
-      for(var i=0;i<allPlayers.length;i++){
-         if(allPlayers[i].id == data.id){
-            allPlayers[i].destroy(true);//destroy the player
-            allPlayers.splice(i,1);//remove him
-            break;//collection changed we have to break, so assume only 1 player id
-         }
-      }
+      allEntities[data.id].destroy(true);
+      delete allEntities[data.id];
    });
-   socket.on('playerMoved', function(data){
+   socket.on('entityMoved', function(data){
       //console.log(data);
       var pos = serverToLocalPos(data.x, data.y);
       if(data.id==player.id){
@@ -73,12 +80,7 @@ function setUpProtocol(){
          player.target.y = pos.y;
          return;
       }
-      allPlayers.forEach(function(player){
-            if(player.id == data.id){
-               player.target.x = pos.x;
-               player.target.y = pos.y;
-            }
-      });
+      allEntities[data.id].target = pos;
    });
    socket.on('cannotMove', function(data){
       var pos = serverToLocalPos(data.x, data.y);
